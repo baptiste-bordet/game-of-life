@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useRef } from 'react'
+import { drawCell, drawGrid, getCellCoordinates } from './helpers/shape'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const Canvas = () => {
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const context = canvas.getContext('2d')
+
+    let canvasWidth = canvas.width
+    let canvasHeight = canvas.height
+
+    if (window.devicePixelRatio > 1) {
+      canvas.width = canvasWidth * window.devicePixelRatio
+      canvas.height = canvasHeight * window.devicePixelRatio
+      canvas.style.width = canvasWidth + 'px'
+      canvas.style.height = canvasHeight + 'px'
+
+      context.scale(window.devicePixelRatio, window.devicePixelRatio)
+    }
+
+    drawGrid(context, canvasWidth, canvasHeight)
+
+    canvas.addEventListener('click', (event) => {
+      const { x, y } = getCellCoordinates(canvas, event)
+      drawCell(context, x, y)
+    })
+  }, [])
+
+  return <canvas ref={canvasRef} width={2000} height={2000} />
 }
 
-export default App;
+const App = () => {
+  return <Canvas />
+}
+
+export default App
